@@ -8,4 +8,8 @@ if (process.argv.length < 3) {
 
 
 rmoo = new Rmoo(config)
-rmoo.login().then(console.log)
+rmoo.login().then(function () {
+  return rmoo.getLibrary()
+}).then(function () {
+  return rmoo.getBookEpub('210034927000101')
+}).then(console.log)
