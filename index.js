@@ -122,7 +122,8 @@ Rmoo.prototype.getBookEpub = function (id) {
     })
     return new Promise.all(p)
   }).then(function () {
-    exec('cd ' + id + ' && zip -r ../' + id + '.epub *')
+    exec('zip -r ../' + id + '.epub *', {cwd: id})
+    exec('rm -rf ' + id)
     console.log('done')
   })
 }

@@ -11,5 +11,5 @@ rmoo = new Rmoo(config)
 rmoo.login().then(function () {
   return rmoo.getLibrary()
 }).then(function () {
-  return rmoo.getBookEpub('210034927000101')
+  return rmoo.getBookEpub(process.argv.pop())
 }).then(console.log)
