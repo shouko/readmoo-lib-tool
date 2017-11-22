@@ -8,7 +8,7 @@ var headers = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; rv:10.0) Gecko/20100101 Firefox/10.0'
 }
 
-var rmoo = function (params) {
+var Rmoo = function (params) {
   ['username', 'password'].forEach(function (key) {
     if(typeof(params[key]) == 'undefined') throw 'Too few arguments'
     this[key] = params[key]
@@ -16,7 +16,7 @@ var rmoo = function (params) {
   this.jar = rp.jar()
 }
 
-rmoo.prototype.login = function () {
+Rmoo.prototype.login = function () {
   
 }
 
@@ -24,7 +24,7 @@ rmoo.prototype.getLibrary = function () {
   // https://new-read.readmoo.com/api/me/library/books?count=100
 }
 
-rmoo.prototype.getBook = function (id) {
+Rmoo.prototype.getBook = function (id) {
   return rp({
     headers: headers,
     uri: host + '/api/book/' + id + '/nav',
@@ -37,4 +37,4 @@ rmoo.prototype.getBook = function (id) {
   })
 }
 
-module.exports = rmoo
+module.exports = Rmoo
