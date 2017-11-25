@@ -2,6 +2,7 @@ var fs = require('fs')
 var request = require('request')
 var rp = require('request-promise')
 var Promise = require('bluebird')
+var path = require('path')
 var exec = require('child_process').execSync
 
 var urls = {
@@ -89,17 +90,7 @@ Rmoo.prototype.getBookEpub = function (id) {
     base = meta.base
     navDir = meta.nav_dir.replace(meta.base, '')
     opf = meta.opf
-    exec('rm -rf ' + id);
-    [
-      id,
-      id + '/META-INF',
-      id + '/' + navDir,
-      id + '/' + navDir + 'Text',
-      id + '/' + navDir + 'Styles',
-      id + '/' + navDir + 'Images'
-    ].forEach(function (fn) {
-      exec('mkdir -p ' + fn)
-    })
+    exec('rm -rf ' + id)
     return new Promise.all([
       'mimetype',
       'META-INF/container.xml',
@@ -137,6 +128,7 @@ Rmoo.prototype.downloadFile = function (base, wd, fn) {
     encoding: 'binary'
   }).then(function (response) {
     console.log('Downloaded', fn)
+    exec('mkdir -p ' + path.dirname(wd + '/' + fn))
     return fs.writeFileSync(wd + '/' + fn, response, 'binary')
   }).catch(function (e) {
   })
