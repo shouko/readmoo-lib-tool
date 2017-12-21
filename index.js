@@ -4,6 +4,7 @@ var rp = require('request-promise')
 var Promise = require('bluebird')
 var path = require('path')
 var exec = require('child_process').execSync
+var CookieFileStore = require('tough-cookie-filestore')
 
 var urls = {
   readerHome: 'https://reader.readmoo.com/reader/index.html',
@@ -11,6 +12,8 @@ var urls = {
   loginPage: 'https://member.readmoo.com/login',
   library: 'https://new-read.readmoo.com/api/me/library/books?count=100'
 }
+
+var cookieFile = 'cookies.json'
 
 var headers = {
   'Referer': urls.readerHome,
@@ -24,7 +27,23 @@ var Rmoo = function (params) {
     if(typeof(params[key]) == 'undefined') throw 'Too few arguments'
     this[key] = params[key]
   }.bind(this))
-  this.jar = rp.jar()
+  if (!fs.existsSync(cookieFile)) fs.writeFileSync(cookieFile, '')
+  this.jar = rp.jar(new CookieFileStore(cookieFile))
+}
+
+Rmoo.prototype.init = function () {
+  var _this = this
+  return new Promise(function (resolve, reject) {
+    _this.getLibrary().then(function () {
+      resolve()
+    }).catch(function (err) {
+      _this.login().then(function () {
+        resolve()
+      }).catch(function (err) {
+        reject(err)
+      })
+    })
+  })
 }
 
 Rmoo.prototype.login = function () {
@@ -63,6 +82,11 @@ Rmoo.prototype.getLibrary = function () {
     uri: urls.library,
     jar: _this.jar,
     json: true
+  }).then(function (response) {
+    if (typeof(response['data']) == 'undefined' || response['status'] == 'error_login') throw 'Not logged in'
+    return response
+  }).catch(function (err) {
+    throw err
   })
 }
 

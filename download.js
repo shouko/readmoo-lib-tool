@@ -8,7 +8,7 @@ if (process.argv.length < 3) {
 
 
 rmoo = new Rmoo(config)
-rmoo.login().then(function () {
+rmoo.init().then(function () {
   return rmoo.getLibrary()
 }).then(function () {
   return rmoo.getBookEpub(process.argv.pop())
