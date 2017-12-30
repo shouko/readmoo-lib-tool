@@ -1,4 +1,8 @@
 module.exports = {
   username: '',
-  password: ''
+  password: '',
+  rcloneBin: 'rclone',
+  rcloneConfig: '/home/username/.config/rclone/rclone.conf',
+  rcloneRemoteName: '',
+  rcloneRemotePath: 'books/'
 }

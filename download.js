@@ -11,5 +11,5 @@ rmoo = new Rmoo(config)
 rmoo.init().then(function () {
   return rmoo.getLibrary()
 }).then(function () {
-  return rmoo.getBookEpub(process.argv.pop())
+  return rmoo.getBookEpub(process.argv.pop(), 1)
 }).then(console.log)

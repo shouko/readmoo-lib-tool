@@ -106,12 +106,13 @@ Rmoo.prototype.getBookMeta = function (id) {
   })
 }
 
-Rmoo.prototype.getBookEpub = function (id) {
+Rmoo.prototype.getBookEpub = function (id, verbose) {
   var _this = this
   var opf = ''
   var base = ''
   var navDir = ''
-  this.getBookMeta(id).then(function (meta) {
+  return this.getBookMeta(id).then(function (meta) {
+    console.log('Downloading', id)
     base = meta.base
     navDir = meta.nav_dir.replace(meta.base, '')
     opf = meta.opf
@@ -126,7 +127,7 @@ Rmoo.prototype.getBookEpub = function (id) {
       'META-INF/signatures.xml',
       navDir + opf
     ].map(function (fn) {
-      return _this.downloadFile(base, id, fn)
+      return _this.downloadFile(base, id, fn, verbose)
     }))
   }).then(function () {
     var rootFile = fs.readFileSync(id + '/' + navDir + opf, 'utf-8')
@@ -134,17 +135,17 @@ Rmoo.prototype.getBookEpub = function (id) {
     rootFile.split('manifest>')[1].split('href="').forEach(function (element) {
       var fn = element.split('"')
       if (fn.length == 1) return;
-      p.push(_this.downloadFile(base, id, navDir + fn[0]))
+      p.push(_this.downloadFile(base, id, navDir + fn[0], verbose))
     })
     return new Promise.all(p)
   }).then(function () {
     exec('zip -r ../' + id + '.epub *', {cwd: id})
     exec('rm -rf ' + id)
-    console.log('done')
+    console.log('Done', id)
   })
 }
 
-Rmoo.prototype.downloadFile = function (base, wd, fn) {
+Rmoo.prototype.downloadFile = function (base, wd, fn, verbose) {
   var _this = this
   return rp({
     headers: headers,
@@ -152,7 +153,7 @@ Rmoo.prototype.downloadFile = function (base, wd, fn) {
     jar: _this.jar,
     encoding: 'binary'
   }).then(function (response) {
-    console.log('Downloaded', fn)
+    if (verbose) console.log('Downloaded', fn)
     exec('mkdir -p ' + path.dirname(wd + '/' + fn))
     return fs.writeFileSync(wd + '/' + fn, response, 'binary')
   }).catch(function (e) {
