@@ -10,8 +10,9 @@
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.5.1",
+    "file-cookie-store": "^0.2.1",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
-    "tough-cookie-filestore": "0.0.1"
+    "shell-escape": "^0.2.0"
   }
 }

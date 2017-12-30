@@ -4,16 +4,16 @@ var rp = require('request-promise')
 var Promise = require('bluebird')
 var path = require('path')
 var exec = require('child_process').execSync
-var CookieFileStore = require('tough-cookie-filestore')
+var FileCookieStore = require('file-cookie-store');
 
 var urls = {
   readerHome: 'https://reader.readmoo.com/reader/index.html',
   readerHost: 'https://reader.readmoo.com',
   loginPage: 'https://member.readmoo.com/login',
-  library: 'https://new-read.readmoo.com/api/me/library/books?count=100'
+  library: 'https://new-read.readmoo.com/api/me/library/books?count=100&sort=buy'
 }
 
-var cookieFile = 'cookies.json'
+var cookieFile = 'cookies.txt'
 
 var headers = {
   'Referer': urls.readerHome,
@@ -23,12 +23,13 @@ var headers = {
 }
 
 var Rmoo = function (params) {
+  _this = this;
   ['username', 'password'].forEach(function (key) {
     if(typeof(params[key]) == 'undefined') throw 'Too few arguments'
-    this[key] = params[key]
-  }.bind(this))
+    _this[key] = params[key]
+  })
   if (!fs.existsSync(cookieFile)) fs.writeFileSync(cookieFile, '')
-  this.jar = rp.jar(new CookieFileStore(cookieFile))
+  _this.jar = new FileCookieStore(cookieFile, {lockfile : true})
 }
 
 Rmoo.prototype.init = function () {
