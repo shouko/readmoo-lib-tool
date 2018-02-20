@@ -135,7 +135,7 @@ Rmoo.prototype.getBookEpub = function (id, verbose) {
   }).then(function () {
     var rootFile = fs.readFileSync(id + '/' + navDir + opf, 'utf-8')
     var p = []
-    rootFile.split('manifest>')[1].split('href="').forEach(function (element) {
+    rootFile.split('href="').forEach(function (element) {
       var fn = element.split('"')
       if (fn.length == 1) return;
       p.push(_this.downloadFile(base, id, navDir + fn[0], verbose))
