@@ -5,6 +5,7 @@ var Promise = require('bluebird')
 var path = require('path')
 var exec = require('child_process').execSync
 var FileCookieStore = require('file-cookie-store');
+var https = require('https')
 
 var urls = {
   readerHome: 'https://reader.readmoo.com/reader/index.html',
@@ -28,6 +29,8 @@ var Rmoo = function (params) {
     if(typeof(params[key]) == 'undefined') throw 'Too few arguments'
     _this[key] = params[key]
   })
+  _this.httpAgent = new https.Agent()
+  _this.httpAgent.maxSockets = params.maxSockets || 5
   if (!fs.existsSync(cookieFile)) fs.writeFileSync(cookieFile, '')
   _this.jar = new FileCookieStore(cookieFile, {lockfile : true})
 }
@@ -145,18 +148,24 @@ Rmoo.prototype.getBookEpub = function (id, verbose) {
   })
 }
 
-Rmoo.prototype.downloadFile = function (base, wd, fn, verbose) {
+Rmoo.prototype.downloadFile = function (base, wd, fn, verbose, tries) {
   var _this = this
   return rp({
     headers: headers,
     uri: urls.readerHost + base + fn,
     jar: _this.jar,
-    encoding: 'binary'
+    encoding: 'binary',
+    pool: _this.httpAgent
   }).then(function (response) {
     if (verbose) console.log('Downloaded', fn)
     exec('mkdir -p ' + path.dirname(wd + '/' + fn))
     return fs.writeFileSync(wd + '/' + fn, response, 'binary')
   }).catch(function (e) {
+    if (typeof(e.response) == 'undefined' || !e.response.complete) {
+      var toTry = typeof(tries) == 'number' ? tries++ : 1
+      console.log('Error', fn, ', retrying for', toTry)
+      return _this.downloadFile(base, wd, fn, verbose, toTry)
+    }
   })
 }
 

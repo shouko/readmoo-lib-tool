@@ -4,5 +4,6 @@ module.exports = {
   rcloneBin: 'rclone',
   rcloneConfig: '/home/username/.config/rclone/rclone.conf',
   rcloneRemoteName: '',
-  rcloneRemotePath: 'books/'
+  rcloneRemotePath: 'books/',
+  maxSockets: 5
 }
